@@ -9,6 +9,7 @@
 //  https://github.com/danielgindi/Charts
 //
 import Foundation
+import CoreGraphics
 
 
 open class BalloonMarker: MarkerImage
@@ -99,15 +100,11 @@ open class BalloonMarker: MarkerImage
         
         context.saveGState()
         
-        context.setFillColor(color.cgColor)
-        
+        context.setFillColor(UIColor.black.cgColor)
         if offset.y > 0
         {
             context.beginPath()
             context.move(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y + arrowSize.height))
-            context.addLine(to: CGPoint(
                 x: rect.origin.x + (rect.size.width - arrowSize.width) / 2.0,
                 y: rect.origin.y + arrowSize.height))
             //arrow vertex
@@ -117,48 +114,38 @@ open class BalloonMarker: MarkerImage
             context.addLine(to: CGPoint(
                 x: rect.origin.x + (rect.size.width + arrowSize.width) / 2.0,
                 y: rect.origin.y + arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + rect.size.width,
-                y: rect.origin.y + arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + rect.size.width,
-                y: rect.origin.y + rect.size.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y + rect.size.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y + arrowSize.height))
             context.fillPath()
+            
+            let roundedRect = CGRect(x: rect.origin.x, y: rect.origin.y + arrowSize.height, width: rect.size.width, height: rect.size.height - arrowSize.height)
+            
+            let path = UIBezierPath(roundedRect: roundedRect, cornerRadius: roundedRect.size.height / 2)
+            context.setFillColor(color.cgColor)
+            context.addPath(path.cgPath)
+            context.closePath()
+            context.fillPath()
+            
         }
         else
         {
             context.beginPath()
             context.move(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + rect.size.width,
-                y: rect.origin.y))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x + rect.size.width,
-                y: rect.origin.y + rect.size.height - arrowSize.height))
-            context.addLine(to: CGPoint(
                 x: rect.origin.x + (rect.size.width + arrowSize.width) / 2.0,
                 y: rect.origin.y + rect.size.height - arrowSize.height))
             //arrow vertex
             context.addLine(to: CGPoint(
-                x: point.x,
-                y: point.y))
+                x: point.x + offset.x,
+                y: point.y + offset.y))
             context.addLine(to: CGPoint(
                 x: rect.origin.x + (rect.size.width - arrowSize.width) / 2.0,
                 y: rect.origin.y + rect.size.height - arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y + rect.size.height - arrowSize.height))
-            context.addLine(to: CGPoint(
-                x: rect.origin.x,
-                y: rect.origin.y))
+            context.fillPath()
+            
+            let roundedRect = CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.height - arrowSize.height)
+            
+            let path = UIBezierPath(roundedRect: roundedRect, cornerRadius: roundedRect.size.height / 2)
+            context.setFillColor(color.cgColor)
+            context.addPath(path.cgPath)
+            context.closePath()
             context.fillPath()
         }
         
@@ -181,7 +168,7 @@ open class BalloonMarker: MarkerImage
     
     open override func refreshContent(entry: ChartDataEntry, highlight: Highlight)
     {
-        setLabel(String(entry.y))
+        setLabel(String(Int(entry.y)))
     }
     
     @objc open func setLabel(_ newLabel: String)
